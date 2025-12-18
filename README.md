@@ -61,16 +61,29 @@ The system consists of **two independent components**:
 
 ---
 
+## System Block Diagram
+
+> 📊 **Overall System Flow Diagram**
+
+```
+[PLACE BLOCK DIAGRAM IMAGE HERE]
+```
+
+This diagram should illustrate:
+• URL scraping and data collection
+• Preprocessing and embedding generation
+• FAISS vector storage
+• Query understanding via LLM
+• Retrieval and ranking
+• API → Frontend interaction
+
+---
+
 ## Working Prototype
 
 ### UI Screenshot
 
-> <img width="1919" height="925" alt="Working Proof Image" src="https://github.com/user-attachments/assets/f16302b1-7f50-4cb1-b44f-9916a5e0ae7a" />
-
-
-```
-
-```
+<img width="1919" height="925" alt="Working Proof Image" src="https://github.com/user-attachments/assets/f16302b1-7f50-4cb1-b44f-9916a5e0ae7a" />
 
 ### Working Proof Video
 
@@ -80,14 +93,14 @@ The system consists of **two independent components**:
 
 Due to free-tier deployment limitations, a complete **working proof video** has been provided to demonstrate the system’s real-time performance and correctness.
 
-▶️ **Access Working Proof:**  
+▶️ **Access Working Proof:**
 [View Demo Video Folder](https://github.com/dushyant958/SHL-Assessment/tree/main/Working%20Proof)
 
 This video confirms:
 
-• Correct query understanding  
-• Relevant assessment recommendations  
-• Balanced test-type outputs  
+• Correct query understanding
+• Relevant assessment recommendations
+• Balanced test-type outputs
 
 > The video serves as **performance and functionality proof**.
 
@@ -99,27 +112,28 @@ This video confirms:
 .
 ├── api/
 │   ├── app.py                # FastAPI backend for recommendation
-│   └── retrieval_engine.py   # Core retrieval engine using Groq + FAISS
+│   ├── retrieval_engine.py   # Core retrieval engine using Groq + FAISS
+│   └── vector_store/
+│       ├── faiss_index.bin
+│       ├── faiss_index.py
+│       ├── embeddings.pkl
+│       └── metadata.pkl
 ├── data/
-│   ├── assessments_final.json    # Raw scraped assessment data
+│   ├── assessments.txt            # Raw scraped data from assessment detail pages
+│   ├── assessments_final.json     # Cleaned JSON converted from assessments.txt
 │   ├── processed_assessments.json # Preprocessed JSON for embedding
-│   └── urls.json                  # URLs collected from scraping
+│   └── urls.json                  # URLs collected from SHL catalog pages
 ├── embeddings/
 │   └── embeddings.py          # Script to generate embeddings (Gemini used previously)
 ├── evaluation/
-│   ├── evaluation.py          # Script to evaluate recommendation accuracy
-│   ├── SHL_submission.csv     # Output results from evaluation
-│   └── Gen_AI Dataset.csv     # Labeled train/test data
+│   ├── evaluation.py          # Script for recall-based evaluation and re-ranking
+│   ├── SHL_submission.csv     # Final submission file provided to SHL
+│   └── Gen_AI Dataset.csv     # Labeled ground-truth dataset used for evaluation
 ├── frontend/
 │   └── app.py                 # Streamlit frontend to query recommendations
 ├── scraper/
-│   ├── collect_urls.py        # Script to collect assessment URLs
-│   └── scrape_details.py      # Script to scrape individual assessment details
-├── vector_store/
-│   ├── faiss_index.bin
-│   ├── faiss_index.py
-│   ├── embeddings.pkl
-│   └── metadata.pkl
+│   ├── collect_urls.py        # Script to collect assessment URLs (32 pages)
+│   └── scrape_details.py      # Script to scrape assessment details from each URL
 ├── preprocessing.py           # Preprocessing raw JSON into structured JSON
 ├── requirements.txt
 └── README.md
@@ -127,40 +141,39 @@ This video confirms:
 
 ---
 
-## Dataset
+## Data Collection and Processing Pipeline
 
-• **Source**: SHL Product Catalog (Individual Test Solutions only)
-• **Total assessments scraped**: 377
-• **Excluded**: Pre-packaged job solutions
+The data pipeline follows a **clear, multi-stage process**:
 
-### Files Used
+### 1. URL Collection
 
-• `assessments_final.json` – Raw scraped data
-• `processed_assessments.json` – Cleaned and structured data
-• `embeddings.pkl` – Precomputed embeddings
-• `metadata.pkl` – FAISS metadata
+• SHL product catalog contains **32 pages** of Individual Test Solutions
+• `scraper/collect_urls.py` scrapes all assessment URLs
+• URLs are stored in `data/urls.json`
 
-> All data used is **real, scraped, and unmodified**. Artificial data inflation was intentionally avoided.
+### 2. Assessment Data Scraping
 
----
+• Each URL is visited using `scraper/scrape_details.py`
+• Detailed assessment information is extracted
+• Raw scraped output is stored in `data/assessments.txt`
 
-## Data Preprocessing
+### 3. JSON Conversion
 
-The `preprocessing.py` script performs:
+• `assessments.txt` is converted into structured JSON
+• Output saved as `data/assessments_final.json`
 
-• Text cleaning and normalization
-• Job level and language standardization
-• Test type code normalization
-• Generation of canonical embedding text per assessment
+### 4. Preprocessing
 
-The output is saved as `processed_assessments.json`.
+• `preprocessing.py` cleans and normalizes data
+• Generates canonical text representation for embeddings
+• Output saved as `data/processed_assessments.json`
 
 ---
 
 ## Embeddings
 
-• Generated using **Gemini Embedding Model** (at data preparation time)
-• Stored in **FAISS** for fast vector similarity search
+• Generated using **Gemini Embedding Model** during data preparation
+• Stored in **FAISS** inside the backend vector store
 • Embedding dimensionality is fixed and consistent
 
 > ⚠️ Gemini embeddings are **not regenerated** during runtime due to API exhaustion.
@@ -250,12 +263,14 @@ Response
 ## Evaluation
 
 • Implemented in `evaluation/evaluation.py`
-• Compared against labeled dataset
+• Uses **Gen_AI Dataset.csv** as ground-truth labels
+• Dataset corresponds to the **official SHL submission format**
 
-### Metrics
+### Purpose
 
-• Mean Recall@10
-• Test-type balance validation
+• Measure Recall@10
+• Validate ranking quality
+• Support re-ranking experimentation
 
 Results saved to `SHL_submission.csv`.
 
@@ -301,3 +316,5 @@ streamlit run app.py
 • SHL Product Catalog
 • FAISS Vector Search
 • Groq Llama 3.1
+
+---
