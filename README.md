@@ -1,14 +1,95 @@
-Perfect, bro—I can see the screenshot. Based on all the context you gave, here’s how we can structure your README.md. I’ll make it **professional, complete, and aligned with your repo structure**, covering all key points like project overview, data, pipeline, API, frontend, embeddings, evaluation, and usage instructions.
+# SHL Assessment Recommendation System
+
+> ⚠️ **Important Deployment Notice (Read First)**
+>
+> This is a **heavy RAG-based application** involving LLM inference + vector search. The **backend is deployed on Render (free tier ~512 MB RAM)** and the **frontend on Streamlit Cloud**. Due to limited memory and compute on free tiers, **responses may take several minutes or may feel slow/unresponsive**.
+>
+> This is a **deployment limitation, not a system design issue**.
+>
+> • The application runs **fast and smoothly on a local machine**.
+> • There is **no free-tier hosting platform** that currently supports heavy RAG workloads efficiently.
+> • To address this, a **working proof video** demonstrating real-time performance has been uploaded to the GitHub repository.
 
 ---
 
-# SHL Assessment Recommendation System
-
 ## Project Overview
 
-This project implements an **intelligent SHL Assessment Recommendation System** that helps hiring managers and recruiters find the most relevant assessments for any given job description or natural language query. The system leverages **LLM-based query understanding (Groq Llama 3.1 8B instant)** and **pre-computed embeddings** stored in **FAISS** for fast and accurate retrieval.
+This project implements an **intelligent SHL Assessment Recommendation System** that helps hiring managers and recruiters find the most relevant SHL assessments for a given **job description or natural language query**.
 
-The system was designed to handle real-world scenarios where queries can include multiple hard and soft skills, ensuring that recommendations are **balanced across test types** (e.g., Knowledge, Personality, Ability).
+Instead of relying on keyword matching, the system understands **intent, skills, and role requirements**, then retrieves **semantically relevant assessments** while maintaining a **balanced mix of test types** (Knowledge, Ability, Personality, etc.).
+
+The system is built using:
+
+• **LLM-powered query understanding (Groq – Llama 3.1 8B Instant)**
+• **Pre-computed embeddings stored in FAISS** for fast similarity search
+• **RAG-style retrieval pipeline** optimized for real-world recruiter queries
+
+---
+
+## Key Features
+
+• Natural language job description understanding
+• Semantic assessment retrieval using FAISS
+• Intelligent skill extraction (hard + soft skills) via LLM
+• Balanced recommendations across assessment types
+• Precomputed embeddings for low-latency vector search
+• End-to-end pipeline: Scraping → Preprocessing → Embedding → Retrieval → Evaluation
+• Clean API-first backend with FastAPI
+• Interactive Streamlit frontend for recruiters
+
+---
+
+## System Architecture
+
+The system consists of **two independent components**:
+
+### Backend (Deployed on Render)
+
+• FastAPI-based REST service
+• FAISS vector search engine
+• Groq Llama 3.1 for query intent extraction
+• Handles retrieval logic, scoring, and ranking
+
+> Render was chosen over Vercel because **Vercel is not suitable for long-running RAG inference workloads**.
+
+### Frontend (Deployed on Streamlit Cloud)
+
+• Lightweight Streamlit UI
+• Sends natural language queries to backend API
+• Displays ranked assessment recommendations
+• Highlights assessment type diversity
+
+---
+
+## Working Prototype
+
+### UI Screenshot
+
+> <img width="1919" height="925" alt="Working Proof Image" src="https://github.com/user-attachments/assets/f16302b1-7f50-4cb1-b44f-9916a5e0ae7a" />
+
+
+```
+
+```
+
+### Working Proof Video
+
+• Demonstrates real-time query → recommendation flow
+• Shows fast inference on local machine
+• Confirms correct system behavior and output quality
+
+Due to free-tier deployment limitations, a complete **working proof video** has been provided to demonstrate the system’s real-time performance and correctness.
+
+▶️ **Access Working Proof:**  
+[View Demo Video Folder](https://github.com/dushyant958/SHL-Assessment/tree/main/Working%20Proof)
+
+This video confirms:
+
+• Correct query understanding  
+• Relevant assessment recommendations  
+• Balanced test-type outputs  
+
+> The video serves as **performance and functionality proof**.
 
 ---
 
@@ -27,7 +108,7 @@ The system was designed to handle real-world scenarios where queries can include
 │   └── embeddings.py          # Script to generate embeddings (Gemini used previously)
 ├── evaluation/
 │   ├── evaluation.py          # Script to evaluate recommendation accuracy
-│   ├── SHL_submission.csv  # Output results from evaluation
+│   ├── SHL_submission.csv     # Output results from evaluation
 │   └── Gen_AI Dataset.csv     # Labeled train/test data
 ├── frontend/
 │   └── app.py                 # Streamlit frontend to query recommendations
@@ -48,38 +129,43 @@ The system was designed to handle real-world scenarios where queries can include
 
 ## Dataset
 
-* **Raw data source**: SHL product catalog [SHL Product Catalog](https://www.shl.com/solutions/products/product-catalog/)
-* **Number of assessments scraped**: 377 Individual Test Solutions (excluding pre-packaged job solutions)
-* **Files used**:
+• **Source**: SHL Product Catalog (Individual Test Solutions only)
+• **Total assessments scraped**: 377
+• **Excluded**: Pre-packaged job solutions
 
-  * `assessments_final.json`: Raw scraped data
-  * `processed_assessments.json`: Cleaned and structured data ready for embedding
-  * `metadata.pkl`: Metadata for FAISS retrieval
-  * `embeddings.pkl`: Precomputed embeddings
+### Files Used
 
-> Note: Embeddings were originally generated using **Gemini API**. Due to API exhaustion, **Groq Llama 3.1 8B instant** is used for query understanding only, ensuring retrieval works with precomputed embeddings.
+• `assessments_final.json` – Raw scraped data
+• `processed_assessments.json` – Cleaned and structured data
+• `embeddings.pkl` – Precomputed embeddings
+• `metadata.pkl` – FAISS metadata
+
+> All data used is **real, scraped, and unmodified**. Artificial data inflation was intentionally avoided.
 
 ---
 
 ## Data Preprocessing
 
-The `preprocessing.py` script:
+The `preprocessing.py` script performs:
 
-* Cleans text fields (name, description, job levels, languages)
-* Normalizes whitespace
-* Converts test type codes and generates a canonical **embedding text** for each assessment
-* Saves the processed assessments as `processed_assessments.json`
+• Text cleaning and normalization
+• Job level and language standardization
+• Test type code normalization
+• Generation of canonical embedding text per assessment
+
+The output is saved as `processed_assessments.json`.
 
 ---
 
 ## Embeddings
 
-* Generated using **Gemini embeddings model** (expired for later use)
-* Embeddings stored in FAISS for **fast vector search**
-* Shape of embeddings and vector store ensures **efficient similarity search**
-* `embeddings.py` script generates embeddings for raw data
+• Generated using **Gemini Embedding Model** (at data preparation time)
+• Stored in **FAISS** for fast vector similarity search
+• Embedding dimensionality is fixed and consistent
 
-> **Important**: Only query embeddings are now generated using the same dimensional model (`SentenceTransformer` equivalent) to match precomputed embeddings.
+> ⚠️ Gemini embeddings are **not regenerated** during runtime due to API exhaustion.
+
+> Only **query embeddings** are generated at inference time, ensuring dimensional compatibility.
 
 ---
 
@@ -87,127 +173,131 @@ The `preprocessing.py` script:
 
 Implemented in `api/retrieval_engine.py`:
 
-* Uses **FAISS vector search** for candidate assessments
-* Uses **Groq Llama 3.1 8B instant** for **query intent extraction**:
+• FAISS-based semantic retrieval
+• LLM-driven query intent extraction using Groq Llama 3.1
+• Skill identification:
+• Hard skills
+• Soft skills
+• Intelligent ranking with test-type balancing
 
-  * Hard skills
-  * Soft skills
-  * Required test types (Knowledge, Ability, Personality, etc.)
-* Balances recommendations across test types
-* Returns top 5–10 recommendations with:
+### Output Includes
 
-  * Assessment Name
-  * URL
-  * Test Type
-  * Similarity Score
+• Assessment Name
+• Assessment URL
+• Test Type
+• Similarity Score
 
 ---
 
 ## API
 
-**Backend**: FastAPI (`api/app.py`)
+### Backend Framework
 
-Endpoints:
+• FastAPI
 
-1. **Health Check**
+### Endpoints
 
-   * `GET /health`
-   * Returns: `{"status": "ok"}`
+**Health Check**
 
-2. **Assessment Recommendation**
+```
+GET /health
+```
 
-   * `POST /recommend`
-   * Body: `{"query": "<job description text>"}`
-   * Returns: List of top 5–10 recommended assessments (JSON)
+Returns
 
-   ```json
-   [
-     {
-       "assessment_name": "Adobe Photoshop CC",
-       "assessment_url": "https://www.shl.com/...",
-       "test_type": "K",
-       "similarity_score": 0.87
-     }
-   ]
-   ```
+```
+{"status": "ok"}
+```
+
+**Assessment Recommendation**
+
+```
+POST /recommend
+```
+
+Request Body
+
+```
+{
+  "query": "Looking for a Java backend developer with strong communication skills"
+}
+```
+
+Response
+
+```
+[
+  {
+    "assessment_name": "Adobe Photoshop CC",
+    "assessment_url": "https://www.shl.com/...",
+    "test_type": "K",
+    "similarity_score": 0.87
+  }
+]
+```
 
 ---
 
 ## Frontend
 
-**Streamlit app** (`frontend/app.py`):
-
-* Accepts **natural language query** input
-* Calls FastAPI `/recommend` endpoint
-* Displays recommended assessments in **tabular format**
-* Highlights **test type balance**
+• Built with Streamlit
+• Accepts free-form recruiter queries
+• Displays ranked recommendations in tabular format
+• Highlights assessment diversity
 
 ---
 
 ## Evaluation
 
-* `evaluation/evaluation.py` compares recommendations against **labeled train/test queries**
-* Metrics computed:
+• Implemented in `evaluation/evaluation.py`
+• Compared against labeled dataset
 
-  * **Mean Recall@10** (how many relevant assessments appear in top 10)
-  * **Balanced recommendations across test types**
-* Output saved to `evaluation_result.csv`
+### Metrics
+
+• Mean Recall@10
+• Test-type balance validation
+
+Results saved to `SHL_submission.csv`.
 
 ---
 
-## How to Run
+## How to Run Locally
 
-1. **Set up environment**:
+### Setup
 
-```bash
+```
 python -m venv venv
-source venv/bin/activate        # or venv\Scripts\activate on Windows
+source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-2. **Run API**:
+### Run Backend
 
-```bash
+```
 cd api
 uvicorn app:app --reload
 ```
 
-3. **Run Frontend**:
+### Run Frontend
 
-```bash
+```
 cd frontend
 streamlit run app.py
 ```
 
-4. **Test API**:
-
-```bash
-POST http://localhost:8000/recommend
-{
-    "query": "Looking for Java backend developer with strong communication skills"
-}
-```
-
-5. **Evaluate system**:
-
-```bash
-python evaluation/evaluation.py
-```
-
 ---
 
-## Notes
+## Final Notes
 
-* Query embeddings **must match the dimensionality** of precomputed embeddings.
-* Adding fake assessments to increase dataset size is **strongly discouraged**. Stick with real scraped data.
-* Groq Llama is only for **query understanding**, not for embeddings.
+• This is a **production-style RAG system**, not a toy demo
+• Free-tier cloud hosting is the primary performance bottleneck
+• Local execution demonstrates intended speed and behavior
+• Working proof video compensates for deployment constraints
 
 ---
 
 ## References
 
-* SHL Product Catalog: [https://www.shl.com/solutions/products/product-catalog/](https://www.shl.com/solutions/products/product-catalog/)
-* FAISS: [https://faiss.ai/](https://faiss.ai/)
-* Groq Llama 3.1: [https://www.groq.ai/](https://www.groq.ai/)
-
----
+• SHL Product Catalog
+• FAISS Vector Search
+• Groq Llama 3.1
