@@ -2,7 +2,7 @@
 
 > ⚠️ **Important Deployment Notice (Read First)**
 >
-> This is a **heavy RAG-based application** involving LLM inference + vector search. The **backend is deployed on Render (free tier ~512 MB RAM)** and the **frontend on Streamlit Cloud**. Due to limited memory and compute on free tiers, **responses may take several minutes or may feel slow/unresponsive**.
+> This is a **heavy RAG-based application** involving LLM inference + vector search. The **backend is deployed on Render (free tier ~0.1 CPU 512 MB RAM)** and the **frontend on Streamlit Cloud**. Due to limited memory and compute on free tiers, **responses may take several minutes or may feel slow/unresponsive**.
 >
 > This is a **deployment limitation, not a system design issue**.
 >
@@ -63,11 +63,10 @@ The system consists of **two independent components**:
 
 ## System Block Diagram
 
-> 📊 **Overall System Flow Diagram**
+> <img width="3732" height="855" alt="Diagram" src="https://github.com/user-attachments/assets/d9199ca0-3cdc-4f99-91af-28e94f010f72" />
 
-```
-[PLACE BLOCK DIAGRAM IMAGE HERE]
-```
+
+
 
 This diagram should illustrate:
 • URL scraping and data collection
