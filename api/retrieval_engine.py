@@ -1,3 +1,5 @@
+# api/retrieval_engine.py - REVERT TO THIS (original without BM25)
+
 import os
 import pickle
 import faiss
@@ -8,16 +10,31 @@ import json
 from groq import Groq
 
 groq_client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
-gemini_client = genai.Client(api_key="AIzaSyCQUC5kxe6u1ljYko4qBVThZtkuUxPuNp8")
+gemini_client = genai.Client(api_key="AIzaSyAFHPJlLZvoQ4c3iX3-wLijCB_sde22CdQ")
 
 class RetrievalEngine:
     def __init__(self):
-        self.index = faiss.read_index('../vector_store/faiss_index.bin')
-        
-        with open('../vector_store/metadata.pkl', 'rb') as f:
+        # Get absolute path of this file
+        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+        # Correct vector store path (inside api/)
+        vector_store_dir = os.path.join(BASE_DIR, 'vector_store')
+        index_path = os.path.join(vector_store_dir, 'faiss_index.bin')
+        metadata_path = os.path.join(vector_store_dir, 'metadata.pkl')
+
+        # Load FAISS index
+        if not os.path.exists(index_path):
+            raise FileNotFoundError(f"FAISS index not found at {index_path}")
+        self.index = faiss.read_index(index_path)
+
+        # Load metadata
+        if not os.path.exists(metadata_path):
+            raise FileNotFoundError(f"Metadata file not found at {metadata_path}")
+        with open(metadata_path, 'rb') as f:
             self.metadata = pickle.load(f)
-        
-        print(f"✅ Loaded {len(self.metadata)} assessments")
+
+        print(f"✅ Loaded {len(self.metadata)} assessments from {vector_store_dir}")
+
     
     def analyze_query_with_llm(self, query_text):
         prompt = f"""Analyze this job query and extract:
@@ -164,5 +181,3 @@ if __name__ == "__main__":
         print(f"   Types: {rec['test_type']}")
         print(f"   Score: {rec['similarity_score']:.3f}")
         print()
-
-

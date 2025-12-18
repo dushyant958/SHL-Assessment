@@ -37,8 +37,6 @@ data/*
 chroma/
 chromadb/
 faiss_index/
-*.index
-*.bin
 
 .playwright/
 playwright-report/

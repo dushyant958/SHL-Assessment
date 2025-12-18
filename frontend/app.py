@@ -5,7 +5,7 @@ import requests
 
 st.set_page_config(page_title="SHL Assessment Recommender", layout="wide")
 
-st.title(" SHL Assessment Recommendation System")
+st.title("SHL Assessment Recommendation System")
 st.markdown("Enter a job description or query to get personalized assessment recommendations")
 
 # API endpoint
