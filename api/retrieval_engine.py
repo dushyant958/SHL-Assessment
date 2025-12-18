@@ -10,7 +10,9 @@ import json
 from groq import Groq
 
 groq_client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
-gemini_client = genai.Client(api_key="AIzaSyAFHPJlLZvoQ4c3iX3-wLijCB_sde22CdQ")
+gemini_client = genai.Client(
+    api_key=os.environ.get("GEMINI_API_KEY")
+)
 
 class RetrievalEngine:
     def __init__(self):
