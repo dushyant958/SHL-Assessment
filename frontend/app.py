@@ -9,7 +9,7 @@ st.title("SHL Assessment Recommendation System")
 st.markdown("Enter a job description or query to get personalized assessment recommendations")
 
 # API endpoint
-API_URL = "http://localhost:8000"
+API_URL = "https://shl-assessment-iqkp.onrender.com"
 
 # Input
 query = st.text_area(
